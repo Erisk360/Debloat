@@ -1016,6 +1016,34 @@ if ($version -like "*Windows 11*") {
 }
 
 
+
+## ELAN TRASH REMOOVE
+
+
+# List of ELAN app names to remove
+$elanPackages = @(
+    "ELANMicroelectronicsCorpo.ELANTrackPointforThinkpa",
+    "ELANMicroelectronicsCorpo.TrackPoint",
+    "ELANMicroelectronicsCorpo.ELANTouchpadforThinkpad"
+)
+
+foreach ($pkg in $elanPackages) {
+    # Remove for all users (provisioned apps)
+    Get-AppxProvisionedPackage -Online | Where-Object { $_.DisplayName -eq $pkg } | ForEach-Object {
+        Write-Host ">> Removing provisioned package: $($_.DisplayName)" -ForegroundColor Yellow
+        Remove-AppxProvisionedPackage -Online -PackageName $_.PackageName
+    }
+
+    # Remove currently installed instances
+    Get-AppxPackage -AllUsers | Where-Object { $_.Name -eq $pkg } | ForEach-Object {
+        Write-Host ">> Removing installed package: $($_.PackageFullName)" -ForegroundColor Green
+        Remove-AppxPackage -Package $_.PackageFullName -AllUsers
+    }
+}
+
+
+
+
 ############################################################################################################
 #                                              Remove Xbox Gaming                                          #
 #                                                                                                          #
